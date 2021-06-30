@@ -24,5 +24,6 @@ for i in range(len(data[0])):
         plt.setp(p, 'facecolor', cm(c))
 
 axs[-1, -1].axis('off')
+fig.set_size_inches(20, 8)
 plt.savefig("exports/export_history.png", dpi=100)
 plt.show()

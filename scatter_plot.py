@@ -15,5 +15,7 @@ for i in range(len(data[0])):
     axs[math.floor(i / math.ceil(len(data[0]) / 2))][i % math.ceil(len(data[0]) / 2)].set_ylabel('Note')
     axs[math.floor(i / math.ceil(len(data[0]) / 2))][i % math.ceil(len(data[0]) / 2)].tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
 axs[-1, -1].axis('off')
+fig.set_size_inches(20, 8)
+
 plt.savefig("exports/export_scatter_plot.png", dpi=100)
 plt.show()
