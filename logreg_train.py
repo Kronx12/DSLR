@@ -64,52 +64,14 @@ data = np.array(data)
 
 # Create neurons
 neurons = []
-neurons.append(neuron(data, ravenclaw_set))
-neurons.append(neuron(data, slytherin_set))
-neurons.append(neuron(data, gryffindor_set))
-neurons.append(neuron(data, hufflepuff_set))
+neurons.append(neuron("ravenclaw", data, ravenclaw_set))
+neurons.append(neuron("slytherin", data, slytherin_set))
+neurons.append(neuron("gryffindor", data, gryffindor_set))
+neurons.append(neuron("hufflepuff", data, hufflepuff_set))
 
-# neurons[0].insertBias(np.array([-8392.34582622, 1050078.19329623, -6003389.881203]))
-neurons[0].insertBias(np.array([ -89.57835927, 8644.23936994, -58484.33683975]))
-neurons[0].gradient_descent(1000, 0.001, progression=True)
-# neurons[0].gradient_descent(1000, 1, progression=True)
-# neurons[0].gradient_descent(1000, 0.1, progression=True)
-# neurons[0].gradient_descent(1000, 0.01, progression=True)
-# neurons[0].gradient_descent(1000, 0.001, progression=True)
-# neurons[0].gradient_descent(1000, 0.0001, progression=True)
-neurons[0].debug()
-
-neurons[0].plot_history()
-neurons[0].plot_show()
-
-neurons[0].plot_prediction()
-neurons[0].plot_show()
-
-# neurons[0].plot_theta()
-neurons[0].plot_data()
-neurons[0].plot_show()
-
-# xlist = list(range(len(neurons[0].getMean())))
-# plt.plot(xlist, np.array(neurons[0].getMean()))
-# plt.show()
-
-# xlist = list(range(int(min(astronomy_set)), int(max(astronomy_set))))
-
-# plt.plot(xlist, neurons[0].theta[0] * xlist + neurons[0].theta[1] * xlist + neurons[0].theta[2])
-# for i in neurons:
-#     i.gradient_descent(1000, 0.1)
-#     i.debug()
-#     plt.plot(xlist, i.theta[1] * xlist + i.theta[0])
-
-# colors = []
-# for i in range(len(house_set)):
-#     if (ravenclaw_set[i] == 1):
-#         colors.append("red")
-#     elif (slytherin_set[i] == 1):
-#         colors.append("green")
-#     elif (gryffindor_set[i] == 1):
-#         colors.append("blue")
-#     elif (hufflepuff_set[i] == 1):
-#         colors.append("orange")
-# plt.scatter(astronomy_set, herbology_set * 10000, s=2, c=colors)
-# plt.show()
+for i in neurons:
+    i.plot_prediction()
+    i.plot_data()
+    # i.gradient_descent(200000, 0.01, progression=True)
+    # i.plot_history()
+    i.debug()

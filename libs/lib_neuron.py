@@ -4,6 +4,8 @@ import numpy as np
 from matplotlib import cm
 
 class neuron:
+    name = "default_name"
+
     theta = []
     X = []
     Y = []
@@ -12,53 +14,57 @@ class neuron:
 
     history = []
 
-    def __init__(self, x_data, y_data):
+    def __init__(self, name, x_data, y_data):
+        self.name = name
         self.X = np.array(x_data)
         self.X = np.hstack((self.X, np.ones((self.X.shape[0], 1))))
         self.Y = np.array(y_data)
         self.Y = self.Y.reshape((self.Y.shape[0], 1))
         self.n, self.m = self.X.shape
-        self.theta = np.zeros((self.m, 1))
-
-    def plot_theta(self):
-        # xlist = np.array(np.rint(self.X[:,0]))
-        xlist = np.array(list(range(int(min(self.X[:,0])), int(max(self.X[:,0])) + 1)))
-        ylist = xlist * self.theta[0] + xlist * self.theta[1] + self.theta[2]
-        
-        plt.plot(xlist, ylist)
-
-        # zlist = []
-
-        # for i in range(len(ylist)):
-            # zlist.append(xlist * self.theta[0] + ylist[i] * self.theta[1] + self.theta[2])
-
-        # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-        # ax.plot_surface(self.X[:,0], self.X[:,1], self.model(), cmap=cm.coolwarm, linewidth=0, antialiased=False)
+        try:
+            self.restoreBias()
+        except:
+            self.theta = np.zeros((self.m, 1))
 
     def plot_data(self):
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
         xlist = self.X[:, 0]
         ylist = self.X[:, 1]
-
-        print(ylist)
+        zlist = self.Y
         colors = []
         for i in self.Y:
             if i == 1:
                 colors.append("red")
             else:
                 colors.append("blue")
-        plt.scatter(xlist, ylist, c=colors, s=2)
+        xlist_surface = self.X[:,0]
+        ylist_surface  = self.X[:,1]
+        xlist_surface, ylist_surface = np.meshgrid(xlist_surface, ylist_surface)
+        zlist_surface = xlist_surface * self.theta[0] + ylist_surface  * self.theta[1] + self.theta[2]
+        ax.scatter(xlist, ylist, zlist, c=colors)
+        ax.plot_surface(xlist_surface, ylist_surface, zlist_surface, cmap="winter")
+        ax.set_xlabel("X0")
+        ax.set_ylabel("X1")
+        ax.set_zlabel("Model Values")
+        ax.set_title(self.name)
+        plt.show()
+        plt.cla()
+        plt.clf()
+        plt.close()
 
     def plot_history(self):
         xlist = np.array(list(range(len(self.history))))
         plt.plot(self.history)
-
+        plt.show()
+        plt.cla()
+        plt.clf()
+        plt.close()
+        
     def plot_prediction(self):
         sigmoid_v = np.vectorize(self.sigmoid)
         tmp = sigmoid_v(self.model())
         xlist = list(range(len(self.Y)))
         ylist = np.sort(tmp)
-
-        print(ylist)
         colors = []
         for i in self.Y:
             if i == 1:
@@ -66,10 +72,11 @@ class neuron:
             else:
                 colors.append("blue")
         plt.scatter(xlist, ylist, c=colors, s=1)
-
-    def plot_show(self):
         plt.show()
-
+        plt.cla()
+        plt.clf()
+        plt.close()
+        
     def debugMatrix(self, name, x):
         print(name, ":\n", x)
         print(name, "shape:", x.shape)
@@ -91,6 +98,13 @@ class neuron:
 
     def insertBias(self, theta):
         self.theta = theta.reshape((self.m, 1))
+        
+    def restoreBias(self):
+        self.theta = np.loadtxt("export_" + self.name + ".csv", delimiter=",")
+        self.theta = np.reshape(self.theta, (self.m, 1))
+    
+    def saveBias(self):
+        np.savetxt("export_" + self.name + ".csv", self.theta, delimiter=",")
 
     def sigmoid(self, z):
         if -z > np.log(np.finfo(type(z)).max):
@@ -113,8 +127,6 @@ class neuron:
         cost = class1_cost - class2_cost
         cost = cost.sum() / len(self.Y)
         return (cost)
-        # sigmoid_v = np.vectorize(self.sigmoid)
-        # return (self.X.T.dot(np.rint(sigmoid_v(self.model())) - self.Y))
 
     def update_weights(self, lr):
         N = len(self.theta)
@@ -130,24 +142,19 @@ class neuron:
             self.update_weights(learnrate)
             cost = self.cost()
             self.history.append(cost)
-            # if i % 100 == 0:
-                # print("iter: "+str(i) + " cost: "+str(cost))
-            # self.history.append(self.getAccuracy())
-            # self.theta = self.theta - (learnrate / self.n) * self.cost()
             if i % 10 == 0 and (progression):
-                print("Accuracy: ", cost, "%", i, "/", n, " " * 10, end="\r")
+                print("Cost: ", cost, "%", i, "/", n, " " * 10, end="\r")
+        self.saveBias()
         return (self.theta)
 
 if __name__=="__main__":
     x = [[2, 3], [1, 2], [4, 5], [0, 1]]
     y = [0, 1, 0, 1]
-    n = neuron(x, y)
+    n = neuron("defaut", x, y)
+    n.gradient_descent(1000, 0.1, progression=True)
     n.debug()
-    n.gradient_descent(100000, 0.1, progression=True)
-
-    n.plot_theta()
+    
     n.plot_data()
-    n.plot_show()
-
     n.plot_history()
-    n.plot_show()
+    n.plot_data()
+    n.plot_prediction()
